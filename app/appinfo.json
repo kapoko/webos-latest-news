@@ -1,0 +1,14 @@
+{
+  "id": "nl.kasper.latestnews",
+  "version": "1.3.4",
+  "vendor": "Kasper",
+  "type": "web",
+  "title": "Journaal",
+  "main": "index.html",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "requiredACG": [
+    "application.launcher",
+    "application.query"
+  ]
+}

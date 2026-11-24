@@ -1,0 +1,7 @@
+{
+  "name": "nl.kasper.latestnews.service",
+  "version": "1.0.0",
+  "description": "Lists the newest NOS Journaal broadcasts available in the NOS TV app.",
+  "main": "service.js",
+  "private": true
+}

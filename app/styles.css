@@ -1,0 +1,103 @@
+:root {
+  color-scheme: dark;
+  font-family: "Noto Sans", Arial, sans-serif;
+  background: #071a33;
+  color: #fff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 20%, #164a78 0, #071a33 58%);
+}
+
+main {
+  width: min(86vw, 1400px);
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 18px;
+  color: #67d5ff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .22em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(36px, 4vw, 64px);
+}
+
+#status {
+  margin: 20px 0;
+  font-size: 26px;
+}
+
+#details {
+  min-height: 30px;
+  color: #b9cee1;
+  font-size: 20px;
+}
+
+#details:empty { display: none; }
+
+button {
+  margin-top: 32px;
+  padding: 16px 30px;
+  border: 0;
+  border-radius: 8px;
+  background: #f36d21;
+  color: #fff;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+button:focus {
+  outline: 4px solid #fff;
+  outline-offset: 5px;
+}
+
+#episodes {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding: 10px;
+  scroll-padding: 10px;
+}
+
+.group-heading {
+  margin: 16px 0 0;
+  text-align: left;
+  color: #67d5ff;
+  font-size: 26px;
+}
+
+.group-empty {
+  margin: 0;
+  text-align: left;
+  color: #b9cee1;
+  font-size: 20px;
+}
+
+.episode {
+  width: 100%;
+  margin: 0;
+  padding: 18px 28px;
+  background: #153956;
+  text-align: left;
+  cursor: pointer;
+}
+
+.episode span { display: block; }
+.episode-time { font-size: 30px; font-weight: 700; }
+.episode-title { margin-top: 5px; font-size: 22px; }
+.episode-availability { margin-top: 5px; font-size: 18px; color: #b9cee1; }
+.episode:focus { background: #265d86; }

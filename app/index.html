@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laatste Journaal</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="webOSTVjs/webOSTV.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Laatste Journaal</h1>
+    <p id="status" aria-live="polite">Laatste twee uitzendingen per type ophalen…</p>
+    <div id="episodes" aria-label="Uitzendingen per programmatype"></div>
+    <p id="details"></p>
+    <button id="retry" type="button" hidden>Vernieuwen</button>
+  </main>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

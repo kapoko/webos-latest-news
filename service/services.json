@@ -1,0 +1,15 @@
+{
+  "id": "nl.kasper.latestnews.service",
+  "description": "Laatste NOS Journaal service",
+  "services": [
+    {
+      "name": "nl.kasper.latestnews.service",
+      "commands": [
+        {
+          "name": "latest",
+          "public": true
+        }
+      ]
+    }
+  ]
+}
