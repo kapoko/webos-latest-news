@@ -3,7 +3,7 @@
   "version": "1.4.16",
   "vendor": "Kasper",
   "type": "web",
-  "title": "Journaal",
+  "title": "Laatste Journaal",
   "main": "index.html",
   "icon": "icon.png",
   "largeIcon": "largeIcon.png",

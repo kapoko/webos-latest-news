@@ -1,34 +1,41 @@
 """Generate the launcher icons. Requires Pillow."""
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 
 ROOT = Path(__file__).resolve().parent.parent
-FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-
 for filename, size in [("icon.png", 80), ("largeIcon.png", 160)]:
-    image = Image.new("RGB", (size, size), "#071a33")
+    # Draw at higher resolution to keep small launcher icons smooth.
+    canvas_size = size * 4
+    image = Image.new("RGB", (canvas_size, canvas_size), "#071a33")
     draw = ImageDraw.Draw(image)
+
+    def box(left, top, right, bottom):
+        return tuple(value * canvas_size for value in (left, top, right, bottom))
+
+    # A simple news card, with a red headline accent and short article lines.
     draw.rounded_rectangle(
-        (size * 0.05, size * 0.05, size * 0.95, size * 0.95),
-        radius=size * 0.12,
+        box(0.14, 0.21, 0.86, 0.79),
+        radius=canvas_size * 0.055,
+        fill="#ffffff",
+    )
+    draw.rounded_rectangle(
+        box(0.22, 0.30, 0.48, 0.36),
+        radius=canvas_size * 0.015,
+        fill="#e34248",
+    )
+    for top, right in [(0.44, 0.46), (0.54, 0.43), (0.64, 0.46)]:
+        draw.rounded_rectangle(
+            box(0.22, top, right, top + 0.035),
+            radius=canvas_size * 0.012,
+            fill="#8292a5",
+        )
+    # The play symbol makes direct video playback the primary message.
+    draw.polygon(
+        [(canvas_size * x, canvas_size * y)
+         for x, y in [(0.56, 0.37), (0.56, 0.67), (0.79, 0.52)]],
         fill="#164a78",
     )
-    for text, center_y, color in [
-        ("JOURNAAL", 0.50, "#ffffff"),
-    ]:
-        font_size = int(size * 0.20)
-        font = ImageFont.truetype(FONT, font_size)
-        while draw.textbbox((0, 0), text, font=font)[2] > size * 0.86:
-            font_size -= 1
-            font = ImageFont.truetype(FONT, font_size)
-        bounds = draw.textbbox((0, 0), text, font=font)
-        draw.text(
-            ((size - (bounds[2] - bounds[0])) / 2,
-             size * center_y - (bounds[3] - bounds[1]) / 2 - bounds[1]),
-            text,
-            font=font,
-            fill=color,
-        )
+    image = image.resize((size, size), Image.Resampling.LANCZOS)
     image.save(ROOT / "app" / filename)
