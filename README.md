@@ -1,4 +1,4 @@
-![Laatste Journaal icon](app/icon.png)
+<img src="app/largeIcon.png" alt="Laatste Journaal icon" width="80" height="80">
 
 # webOS Laatste NOS Journaal
 
@@ -18,6 +18,12 @@ You need [Homebrew Channel](https://github.com/webosbrew/webos-homebrew-channel)
 3. Refresh the app list, find **Laatste Journaal**, and select **Install**.
 
 Keep the repository added to receive future updates through Homebrew Channel. The app will appear once the first release is available.
+
+### Open from a computer with the repository URL prefilled
+
+```sh
+ares-launch --device <YOUR_TV> org.webosbrew.hbchannel -p '{"launchMode":"addRepository","url":"https://raw.githubusercontent.com/kapoko/webos-latest-news/main/repo.json"}'
+```
 
 ## Manual installation
 
