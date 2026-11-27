@@ -171,7 +171,7 @@
     clearCache();
     busy = true;
     retry.hidden = true;
-    show('Recente en eerdere uitzendingen ophalen', '', true);
+    show('Recente uitzendingen ophalen', '', true);
     if (!window.webOS || !webOS.service) {
       busy = false;
       show('Deze app werkt alleen op een LG webOS-tv.');

@@ -26,7 +26,7 @@ Requires Node.js and the [webOS CLI](https://webostv.developer.lge.com/develop/t
 npm install -g @webos-tools/cli
 node --test test/*.cjs
 ares-package app service -o dist
-ares-install -d <device> dist/nl.kasper.latestnews_1.4.15_all.ipk
+ares-install -d <device> dist/nl.kasper.latestnews_1.4.16_all.ipk
 ares-launch -d <device> nl.kasper.latestnews
 ```
 
