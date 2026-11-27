@@ -7,9 +7,45 @@
   const retry = document.getElementById('retry');
   let busy = false;
   let wasHidden = false;
+  const CACHE_KEY = 'journaal-list-v1';
+  const CACHE_TTL = 120000;
+  let cachedList = null;
 
-  function show(message, extra = '') {
+  function readCache() {
+    try {
+      if (!cachedList && window.sessionStorage) {
+        cachedList = JSON.parse(window.sessionStorage.getItem(CACHE_KEY));
+      }
+      if (cachedList && Number.isFinite(cachedList.savedAt) &&
+          cachedList.savedAt <= Date.now() && Date.now() - cachedList.savedAt < CACHE_TTL &&
+          Array.isArray(cachedList.episodes) && cachedList.episodes.every((episode) =>
+            episode && typeof episode.title === 'string' &&
+            Number.isFinite(episode.firstBroadcastDate))) {
+        return cachedList;
+      }
+    } catch {
+      // Storage can be unavailable on some TV/browser configurations.
+    }
+    return null;
+  }
+
+  function clearCache() {
+    cachedList = null;
+    try {
+      if (window.sessionStorage) window.sessionStorage.removeItem(CACHE_KEY);
+    } catch {}
+  }
+
+  function saveCache(episodes, warning) {
+    cachedList = { savedAt: Date.now(), episodes, warning };
+    try {
+      if (window.sessionStorage) window.sessionStorage.setItem(CACHE_KEY, JSON.stringify(cachedList));
+    } catch {}
+  }
+
+  function show(message, extra = '', loading = false) {
     status.textContent = message;
+    status.className = loading ? 'loading-spinner' : '';
     details.textContent = extra;
   }
 
@@ -23,6 +59,11 @@
 
   function chooseEpisode(episode) {
     if (busy) return;
+    if (episode.playbackMode === 'native' && episode.nosId &&
+        episode.nosAvailability === 'available') {
+      window.location.href = `playback.html?id=${encodeURIComponent(episode.nosId)}`;
+      return;
+    }
     if (!config.nosAppId) {
       show('NOS-app moet nog worden gekoppeld.', 'Het NOS-app-id op deze televisie is nog niet bevestigd.');
       return;
@@ -35,7 +76,7 @@
       return;
     }
     busy = true;
-    show('Gekozen journaal openen…', formatDate(episode.firstBroadcastDate));
+    show('Gekozen journaal openen', formatDate(episode.firstBroadcastDate), true);
     webOS.service.request('luna://com.webos.applicationManager', {
       method: 'launch',
       parameters: {
@@ -69,7 +110,7 @@
     episodes.forEach((episode) => {
       const type = episode.programType || episode.title;
       if (!groups.has(type)) return;
-      if (groups.get(type).length < 2) groups.get(type).push(episode);
+      if (groups.get(type).length < 3) groups.get(type).push(episode);
     });
     groups.forEach((group, type) => {
       const heading = document.createElement('h2');
@@ -91,7 +132,9 @@
         time.textContent = formatDate(episode.firstBroadcastDate);
         const title = document.createElement('span');
         title.className = 'episode-title';
-        title.textContent = `${index === 0 ? 'Nieuwste' : 'Vorige'} · ${episode.title}`;
+        const duration = Number.isFinite(episode.durationInSeconds)
+          ? ` · ${Math.round(episode.durationInSeconds / 60)} min` : '';
+        title.textContent = `${index === 0 ? 'Nieuwste' : 'Eerder'} · ${episode.title}${duration}`;
         const availability = document.createElement('span');
         availability.className = 'episode-availability';
         availability.textContent = episode.nosAvailability === 'available'
@@ -99,7 +142,10 @@
           : episode.nosAvailability === 'unavailable'
             ? 'Niet gevonden in de NOS-catalogus'
             : 'NOS-beschikbaarheid onbekend';
-        button.append(time, title, availability);
+        button.append(time, title);
+        if (episode.playbackMode !== 'native' || episode.nosAvailability !== 'available') {
+          button.append(availability);
+        }
         button.addEventListener('click', () => chooseEpisode(episode));
         list.append(button);
       });
@@ -108,11 +154,24 @@
     if (first) first.focus();
   }
 
-  function getLatestEpisodes() {
+  function displayList(episodes, warning = '') {
+    renderEpisodes(episodes);
+    show(episodes.length ? '' : 'Geen beschikbare uitzendingen gevonden bij NOS.', warning);
+    retry.hidden = false;
+    if (!episodes.length) retry.focus();
+  }
+
+  function getLatestEpisodes(force = false) {
     if (busy) return;
+    const cached = force ? null : readCache();
+    if (cached) {
+      displayList(cached.episodes, cached.warning);
+      return;
+    }
+    clearCache();
     busy = true;
     retry.hidden = true;
-    show('Laatste twee uitzendingen per type ophalen…');
+    show('Recente en eerdere uitzendingen ophalen', '', true);
     if (!window.webOS || !webOS.service) {
       busy = false;
       show('Deze app werkt alleen op een LG webOS-tv.');
@@ -124,12 +183,9 @@
       onSuccess(response) {
         busy = false;
         const episodes = Array.isArray(response.episodes) ? response.episodes : [];
-        renderEpisodes(episodes);
-        show(episodes.length
-          ? 'Uitzendingen per type · Kies met ↑ / ↓ en OK.'
-          : 'Geen beschikbare uitzendingen gevonden bij NOS.');
-        retry.hidden = false;
-        if (!episodes.length) retry.focus();
+        const warning = typeof response.warning === 'string' ? response.warning : '';
+        saveCache(episodes, warning);
+        displayList(episodes, warning);
       },
       onFailure(error) {
         busy = false;
@@ -141,8 +197,8 @@
     });
   }
 
-  retry.addEventListener('click', getLatestEpisodes);
-  document.addEventListener('webOSRelaunch', getLatestEpisodes);
+  retry.addEventListener('click', () => getLatestEpisodes(true));
+  document.addEventListener('webOSRelaunch', () => getLatestEpisodes());
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) wasHidden = true;
     else if (wasHidden) {

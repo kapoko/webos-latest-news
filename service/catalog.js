@@ -1,4 +1,4 @@
-function latestNosEpisodes(broadcasts, now) {
+function latestNosEpisodes(broadcasts, now, perType = 2) {
   if (!Array.isArray(broadcasts)) throw new Error('Ongeldige NOS-catalogus.');
   const groups = new Map();
   const sorted = broadcasts.filter((item) =>
@@ -18,7 +18,7 @@ function latestNosEpisodes(broadcasts, now) {
     if (!groups.has(program.system_name)) groups.set(program.system_name, []);
     const group = groups.get(program.system_name);
     const time = Date.parse(item.date_scheduled) / 1000;
-    if (group.length < 2 && !group.some((episode) =>
+    if (group.length < perType && !group.some((episode) =>
       episode.firstBroadcastDate === time || episode.nosId === String(item.id)
     )) {
       group.push({

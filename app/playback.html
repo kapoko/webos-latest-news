@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NOS Journaal afspelen</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="webOSTVjs/webOSTV.js"></script>
+</head>
+<body class="player-page">
+  <video id="video" playsinline></video>
+  <section id="player-controls" class="player-panel" aria-label="Afspeelbediening">
+    <p id="player-episode"></p>
+    <div class="player-bar">
+      <button id="toggle-play" type="button" disabled>Afspelen</button>
+      <button id="rewind" type="button" aria-label="15 seconden terug" disabled>−15 s</button>
+      <input id="seek" type="range" min="0" max="0" value="0" step="1"
+        aria-label="Afspeelpositie" disabled>
+      <span id="player-time">0:00 / 0:00</span>
+    </div>
+    <p id="player-status" class="loading-spinner" aria-live="polite">Uitzending ophalen</p>
+    <button id="play" type="button">Start / opnieuw proberen</button>
+  </section>
+  <script src="playback.js"></script>
+</body>
+</html>
