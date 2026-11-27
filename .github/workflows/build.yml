@@ -1,0 +1,105 @@
+name: Build and release IPK
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "26"
+      - name: Test
+        run: node --test test/*.cjs
+      - name: Validate release version
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          node -e 'const app = require("./app/appinfo.json"); if (process.env.RELEASE_TAG !== `v${app.version}`) throw new Error("Tag must match app/appinfo.json version");'
+      - name: Install webOS CLI
+        run: npm install --global @webos-tools/cli@3.2.6
+      - name: Package app and service
+        run: ares-package app service -o dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: webos-ipk
+          path: dist/*.ipk
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: homebrew-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "26"
+      - uses: actions/download-artifact@v8
+        with:
+          name: webos-ipk
+          path: dist
+      - name: Generate Homebrew Channel manifest
+        env:
+          REPOSITORY: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: node scripts/create-repo.cjs dist/*.ipk "$REPOSITORY" "$RELEASE_TAG" "$DEFAULT_BRANCH" dist/repo.json
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --verify-tag --title "$RELEASE_TAG" --generate-notes
+          fi
+          gh release upload "$RELEASE_TAG" dist/*.ipk dist/repo.json --clobber
+      - name: Save released manifest
+        run: cp dist/repo.json "$RUNNER_TEMP/released-repo.json"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Update repository feed
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const next = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/released-repo.json`));
+          const current = JSON.parse(fs.readFileSync("repo.json"));
+          const previous = current.packages[0]?.manifest.version;
+          const version = next.packages[0].manifest.version;
+          const compare = (a, b) => {
+            const x = a.split(".").map(Number), y = b.split(".").map(Number);
+            for (let i = 0; i < 3; i++) {
+              if (x[i] !== y[i]) return x[i] - y[i];
+            }
+            return 0;
+          };
+          if (!previous || compare(version, previous) >= 0) {
+            fs.writeFileSync("repo.json", JSON.stringify(next, null, 2) + "\n");
+          }
+          NODE
+          if git diff --quiet -- repo.json; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add repo.json
+          git commit -m "chore: update Homebrew Channel release"
+          git push origin "HEAD:$DEFAULT_BRANCH"

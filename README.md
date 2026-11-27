@@ -1,4 +1,4 @@
-# Journaal
+# Laatste Journaal
 
 LG webOS app for NOS Journaal and the 20:00 edition. Shows up to three available broadcasts per type with Dutch dates/times and durations. Select with arrow keys and OK to play directly on the TV, without NPO Start or profile selection.
 
@@ -19,6 +19,33 @@ The episode title line shows the current decoded video height beside the duratio
 The simple bottom bar has play/pause, a **15 seconds back** button, and a seek slider with a playhead and elapsed/total time. Cursor movement reveals it; it hides after three seconds without interaction. **Back** hides the bar first; another Back returns to the list. Use remote arrows to navigate the buttons; left/right on the slider seek 15 seconds and up/down leave the slider. **OK** activates the selected control (or toggles playback when the bar is hidden). Errors stay visible until dismissed. On a failure, note the displayed video error and retry with Start. Native playback was confirmed on the user's LG TV with the 27 November 2026, 07:00 bulletin. Only direct `npox.nl` stream URLs are currently supported; other resolver formats are reported as unsupported.
 
 ## Development
+
+### GitHub builds and Homebrew Channel
+
+GitHub Actions runs the tests and packages both the app and its service on pushes,
+pull requests, and manual runs. Download the `webos-ipk` artifact from the run.
+
+To publish a release, first update `version` in `app/appinfo.json`, commit the
+changes, then push a matching tag (for example, `v1.4.16`). The workflow publishes
+the IPK and a generated `repo.json` as GitHub release assets, then commits the
+same manifest to the default branch. Its SHA-256 and size come from the released
+IPK. Publishing an older version will not downgrade the repository feed.
+
+After the first successful release, add this custom repository URL in Homebrew
+Channel (assuming the default branch is `main`):
+
+```text
+https://raw.githubusercontent.com/kapoko/webos-latest-news/main/repo.json
+```
+
+The initial feed is empty until a release is built. The repository and release
+assets must be publicly accessible. Actions needs permission to write repository
+contents; branch protection must permit its manifest commit. If that commit is
+blocked, the release still contains `repo.json`, which can be copied to the
+default branch manually. This is a custom feed, not a submission to the official
+Homebrew Channel catalogue. The app is unofficial and is not affiliated with NOS.
+
+### Local packaging
 
 Requires Node.js and the [webOS CLI](https://webostv.developer.lge.com/develop/tools/cli-installation). Enable Developer Mode on the TV and pair it using `ares-setup-device` and `ares-novacom --getkey`.
 
