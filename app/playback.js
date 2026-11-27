@@ -102,7 +102,7 @@
     video.load();
     updateProgress();
     show('Gekozen uitzending en verse stream-URL ophalen', true);
-    webOS.service.request('luna://nl.kasper.latestnews.service', {
+    webOS.service.request('luna://nl.kapoko.latestnews.service', {
       method: 'playback',
       parameters: { nosId: id },
       onSuccess(response) {

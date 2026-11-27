@@ -1,3 +1,24 @@
 {
-  "packages": []
+  "packages": [
+    {
+      "id": "nl.kapoko.latestnews",
+      "title": "Laatste Journaal",
+      "shortDescription": "Bekijk snel het laatste journaal",
+      "iconUri": "https://raw.githubusercontent.com/kapoko/webos-latest-news/main/app/largeIcon.png",
+      "manifest": {
+        "id": "nl.kapoko.latestnews",
+        "version": "1.0.0",
+        "type": "web",
+        "title": "Laatste Journaal",
+        "iconUri": "https://raw.githubusercontent.com/kapoko/webos-latest-news/main/app/largeIcon.png",
+        "sourceUrl": "https://github.com/kapoko/webos-latest-news",
+        "rootRequired": false,
+        "ipkUrl": "https://github.com/kapoko/webos-latest-news/releases/download/v1.0.0/nl.kapoko.latestnews_1.0.0_all.ipk",
+        "ipkHash": {
+          "sha256": "ab66a88f0bf644f9826205d88390034608cebc7384eda26ee608c003bc1d4ac7"
+        },
+        "ipkSize": 18050
+      }
+    }
+  ]
 }

@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const { latestNosEpisodes } = require('./catalog');
 const { createArchiveLookup } = require('./archive');
 
-const service = new Service('nl.kasper.latestnews.service');
+const service = new Service('nl.kapoko.latestnews.service');
 const endpoint = 'https://api.nos.nl/smarttv/v3/broadcasts';
 
 function fetchText(url, headers, timeout = 15000) {

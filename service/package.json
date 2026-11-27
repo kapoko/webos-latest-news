@@ -1,5 +1,5 @@
 {
-  "name": "nl.kasper.latestnews.service",
+  "name": "nl.kapoko.latestnews.service",
   "version": "1.0.0",
   "description": "Discovers recent NOS Journaal broadcasts and resolves native playback streams.",
   "main": "service.js",

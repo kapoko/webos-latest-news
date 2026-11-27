@@ -1,9 +1,9 @@
 {
-  "id": "nl.kasper.latestnews.service",
+  "id": "nl.kapoko.latestnews.service",
   "description": "Laatste NOS Journaal service",
   "services": [
     {
-      "name": "nl.kasper.latestnews.service",
+      "name": "nl.kapoko.latestnews.service",
       "commands": [
         {
           "name": "latest",

@@ -1,7 +1,7 @@
 {
-  "id": "nl.kasper.latestnews",
+  "id": "nl.kapoko.latestnews",
   "version": "1.0.0",
-  "vendor": "Kasper",
+  "vendor": "kapoko",
   "type": "web",
   "title": "Laatste Journaal",
   "main": "index.html",

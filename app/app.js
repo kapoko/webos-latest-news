@@ -1,5 +1,5 @@
 (() => {
-  const SERVICE_URI = 'luna://nl.kasper.latestnews.service';
+  const SERVICE_URI = 'luna://nl.kapoko.latestnews.service';
   const config = window.latestNewsConfig || {};
   const status = document.getElementById('status');
   const details = document.getElementById('details');
